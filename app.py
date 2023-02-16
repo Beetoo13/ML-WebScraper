@@ -75,8 +75,8 @@ for page in range(1, pages + 1):
         if (validateProduct(product_title, original_price, discounted_price,
                             discount, product_url)):
             products_workbook.write(f"A{idx}", product_title)
-            products_workbook.write(f"B{idx}", int(original_price))
-            products_workbook.write(f"C{idx}", int(discounted_price))
+            products_workbook.write(f"B{idx}", int(discounted_price))
+            products_workbook.write(f"C{idx}", int(original_price))
             products_workbook.write(f"D{idx}", int(discount) / 100)
             products_workbook.write(f"E{idx}", product_url)
             idx += 1
