@@ -1,4 +1,4 @@
-import os, time, random
+import os
 import xlsxwriter
 from dotenv import load_dotenv
 from selenium import webdriver
@@ -22,6 +22,8 @@ firefox_options.set_preference('general.useragent.override', user_agent)
 # Creating workbook for the excel file
 workbook = xlsxwriter.Workbook("ProductsList.xlsx")
 
+print("Creating CSV Workbook")
+
 # Adding format to cells
 title_cell_format = workbook.add_format({
     'bold': True,
@@ -39,16 +41,21 @@ percentage_cell_format = workbook.add_format({
 # Calling initial cells
 products_workbook = workbook.add_worksheet(name="Products-list")
 products_workbook.write("A1", "Product title")
-products_workbook.write("B1", "Discounted price")
-products_workbook.write("C1", "Original price")
+products_workbook.write("B1", "Original price")
+products_workbook.write("C1", "Discounted price")
 products_workbook.write("D1", "Discount")
 products_workbook.write("E1", "Product URL")
 
 # Setting formats for columns
-products_workbook.set_column('A:A', None, title_cell_format)
-products_workbook.set_column('B:B', None, number_cell_format)
-products_workbook.set_column('C:C', None, number_cell_format)
-products_workbook.set_column('D:D', None, percentage_cell_format)
+products_workbook.set_column('A:A', 50, title_cell_format)
+products_workbook.set_column('B:B', 20, number_cell_format)
+products_workbook.set_column('C:C', 20, number_cell_format)
+products_workbook.set_column('D:D', 15, percentage_cell_format)
+products_workbook.set_column('E:E', 60, title_cell_format)
+
+products_workbook.autofilter(0, 0, 10, 3)
+
+print("Applied columns configuration to workbook")
 
 # Base url
 base_url = "https://www.mercadolibre.com.mx/ofertas?container_id=MLM779363-4&page="
@@ -57,8 +64,12 @@ pages = 20
 # Excel index counter
 idx = 2
 
+print("Starting browser...")
+
 # Launch firefox
 browser = webdriver.Firefox(service=firefox_service, options=firefox_options)
+
+print("Browser launched correctly, getting articles")
 
 for page in range(1, pages + 1):
     browser.get(f"{base_url}{page}")
@@ -75,8 +86,8 @@ for page in range(1, pages + 1):
         if (validateProduct(product_title, original_price, discounted_price,
                             discount, product_url)):
             products_workbook.write(f"A{idx}", product_title)
-            products_workbook.write(f"B{idx}", int(discounted_price))
-            products_workbook.write(f"C{idx}", int(original_price))
+            products_workbook.write(f"B{idx}", int(original_price))
+            products_workbook.write(f"C{idx}", int(discounted_price))
             products_workbook.write(f"D{idx}", int(discount) / 100)
             products_workbook.write(f"E{idx}", product_url)
             idx += 1
@@ -85,6 +96,8 @@ for page in range(1, pages + 1):
 
     print(f"Page #{page} products information obtained correctly")
 
+print("Finished getting articles")
+
 workbook.close()
 
-print("File created sucessfully")
+print("CSV file created sucessfully")
